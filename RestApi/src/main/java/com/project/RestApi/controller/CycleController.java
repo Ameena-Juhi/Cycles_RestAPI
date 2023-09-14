@@ -3,6 +3,9 @@ package com.project.RestApi.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.project.RestApi.repository.CycleRepository;
+import com.project.RestApi.repository.UserRepository;
 import com.project.RestApi.service.CycleService;
+import com.project.RestApi.entity.AppUser;
 import com.project.RestApi.entity.Cycle;
 
 @RestController
@@ -29,6 +34,12 @@ public class CycleController {
 	
 	@Autowired
 	private CycleService cycleService;
+	
+	@Autowired
+	private UserRepository userRepository;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 	
 	@GetMapping("/cycles")
 	@ResponseBody
@@ -57,8 +68,9 @@ public class CycleController {
 	
 	@PostMapping("/restock/{id}")
 	public String restock(@PathVariable("id") int id) {
-		cycleService.get(id);
-		//cycleService.save(cycle);
+		var cycle = cycleService.get(id);
+		cycle.setStock(cycle.getStock() + 1);
+		cycleService.save(cycle);
 		return "Success!";
 	}
 	
@@ -68,4 +80,18 @@ public class CycleController {
 		return "Done";
 	}
 	
+	@PostMapping("/register")
+    public ResponseEntity<String> registerUser(@RequestBody AppUser user) {
+        try {
+            if (userRepository.existsByName(user.getName())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username already exists");
+            }
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            userRepository.save(user);
+            return ResponseEntity.ok("User registered successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Registration failed: " + e.getMessage());
+        }
+	
+	}
 }

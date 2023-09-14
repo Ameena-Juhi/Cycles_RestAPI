@@ -10,35 +10,42 @@ import org.springframework.stereotype.Service;
 import com.project.RestApi.entity.AppUser;
 import com.project.RestApi.repository.UserRepository;
 
+
 @Service
 public class DomainUserService {
 
-    private static final String ENCODING_STRATEGY = "{bcrypt}";
-
+    private BCryptPasswordEncoder passwordEncoder;
     private UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
 
-    
     public DomainUserService(@Autowired UserRepository userRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
-    public Optional<AppUser> getByName(String name) {
-        return Optional.ofNullable(userRepository.findByUsername(name));
+    public Optional<AppUser> authenticate(String username, String password) throws Exception {
+        Optional<AppUser> optUser = userRepository.findByName(username);
+        if (optUser.isEmpty()) {
+            throw new Exception("User not found");
+        }
+        if (!optUser.get().getPassword().equals(password)) {
+            return Optional.empty();
+        }
+        return optUser;
     }
 
-    private String prefixEncodingStrategyAndEncode(String rawString) {
-        return ENCODING_STRATEGY + passwordEncoder.encode(rawString);
-    }
-
-    public AppUser save(String username, String password) {
-        AppUser user = new AppUser();
-        user.setName(username); 
-        user.setPassword(prefixEncodingStrategyAndEncode(password));
+    public AppUser create(AppUser user) {
+        user.setPassword("{bcrypt}" + passwordEncoder.encode(user.getPassword()));
+        //user.setPassword("{noop}" + user.getPassword());
         return userRepository.save(user);
     }
 
+    public Optional<AppUser> getById(int id) {
+        return userRepository.findById(id);
+    }
 
+    public Optional<AppUser> getByName(String name) {
+        return userRepository.findByName(name);
+    }
+
+    
 }
-

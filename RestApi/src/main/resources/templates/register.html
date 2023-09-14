@@ -6,7 +6,7 @@
 </head>
 <body>
     <h1>Login!</h1>
-    <form method="post" action="#" th:action="@{/forum/register}" th:object="${registrationForm}">
+    <form method="post" action="#" th:action="@{/register}" th:object="${registrationForm}">
         <p th:text="${message}">Correct username and password</p>
         <label for="username">Username</label><br>
         <input type="text" name="username" id="username" th:field="*{username}"><br>
