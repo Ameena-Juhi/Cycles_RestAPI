@@ -1,6 +1,7 @@
 package com.project.RestApi.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,12 +21,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.project.RestApi.repository.CartRepository;
 import com.project.RestApi.repository.CycleRepository;
 import com.project.RestApi.repository.UserRepository;
+import com.project.RestApi.service.CartService;
 import com.project.RestApi.service.CycleService;
 import com.project.RestApi.entity.AppUser;
+import com.project.RestApi.entity.Cart;
 import com.project.RestApi.entity.Cycle;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/cycle")
 public class CycleController {
@@ -34,6 +40,12 @@ public class CycleController {
 	
 	@Autowired
 	private CycleService cycleService;
+	
+	@Autowired
+	private CartRepository cartRepository;
+	
+	@Autowired
+	private CartService cartService;
 	
 	@Autowired
 	private UserRepository userRepository;
@@ -49,29 +61,33 @@ public class CycleController {
 	
 	@PostMapping("/add")
 	@ResponseBody
-	public Cycle newCycle(@RequestBody Cycle cycle) {
-		return cycleRepository.save(cycle);
+	public List<Cycle> newCycle(@RequestBody Cycle cycle) {
+		cycleRepository.save(cycle);
+		return cycleRepository.findAll();
 	}
 	
 	@GetMapping("/borrow/{id}")
-	public String borrowCycle(@PathVariable("id") int id) {
+	@ResponseBody
+	public List<Cycle> borrowCycle(@PathVariable("id") int id) {
 		cycleService.borrow(id);
-		return "Successfully borrowed!";
-		
+		return cycleRepository.findAll();
 	}
 	
 	@GetMapping("/return/{id}")
-	public String returnCycle(@PathVariable("id") int id) {
+	@ResponseBody
+	public List<Cycle> returnCycle(@PathVariable("id") int id) {
 		cycleService.returns(id);
-		return "Successfully returned!";
+		return cycleRepository.findAll();
 	}
 	
 	@PostMapping("/restock/{id}")
-	public String restock(@PathVariable("id") int id) {
+	@ResponseBody
+	public List<Cycle> restock(@PathVariable("id") int id, @RequestBody Map<String, Integer> reqBody) {
+		int count = reqBody.get("qty");
 		var cycle = cycleService.get(id);
-		cycle.setStock(cycle.getStock() + 1);
+		cycle.setStock(cycle.getStock() + count);
 		cycleService.save(cycle);
-		return "Success!";
+		return cycleRepository.findAll();
 	}
 	
 	@GetMapping("/delete/{id}")
@@ -79,6 +95,25 @@ public class CycleController {
 		cycleRepository.deleteById(id);
 		return "Done";
 	}
+	
+	@GetMapping("/addToCart/{id}")
+	@ResponseBody
+	public void addCycleToCart(@PathVariable("id") int id) {
+		Cart cart = new Cart();
+		cartService.addToCart(cart, id);
+		return;
+	}
+	
+	@GetMapping("/showCart")
+	@ResponseBody
+	public void listCartItems() {
+		cartRepository.findAll();
+	}
+	
+//	public List<Cycle> borrowCycle(@PathVariable("id") int id) {
+//		cycleService.borrow(id);
+//		return cycleRepository.findAll();
+//	}
 	
 	@PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody AppUser user) {
