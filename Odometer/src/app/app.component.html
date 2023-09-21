@@ -1,0 +1,12 @@
+<h1>Odometer</h1>
+<h1>{{this.odometer.getReading()}}</h1>
+<input type="number" [(ngModel)]="value" >
+<button (click)="setReading(value)">Set Reading</button>
+<br>
+<br>
+<button (click)="getPreviousReading()">Previous Reading</button>
+<button (click)="getNextReading()">Next Reading</button>
+<button (click)="reset()">Reset</button>
+<div *ngIf="odometer.getMsg()">
+    <span>{{odometer.getMsg()}}</span>
+</div>
