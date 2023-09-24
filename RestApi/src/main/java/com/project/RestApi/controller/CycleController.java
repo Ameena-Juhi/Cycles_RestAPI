@@ -27,7 +27,7 @@ import com.project.RestApi.repository.UserRepository;
 import com.project.RestApi.service.CartService;
 import com.project.RestApi.service.CycleService;
 import com.project.RestApi.entity.AppUser;
-import com.project.RestApi.entity.Cart;
+import com.project.RestApi.entity.CartItem;
 import com.project.RestApi.entity.Cycle;
 
 @CrossOrigin
@@ -96,24 +96,27 @@ public class CycleController {
 		return "Done";
 	}
 	
-	@GetMapping("/addToCart/{id}")
+	@PostMapping("/addToCart/{id}")
 	@ResponseBody
 	public void addCycleToCart(@PathVariable("id") int id) {
-		Cart cart = new Cart();
-		cartService.addToCart(cart, id);
-		return;
+		System.out.println("i reached here!");
+		cartService.addToCart(id);
 	}
 	
 	@GetMapping("/showCart")
 	@ResponseBody
-	public void listCartItems() {
-		cartRepository.findAll();
+	public List<CartItem> listCartItems() {
+		return cartRepository.findAll();
 	}
 	
-//	public List<Cycle> borrowCycle(@PathVariable("id") int id) {
-//		cycleService.borrow(id);
-//		return cycleRepository.findAll();
-//	}
+	@PostMapping("/checkout")
+	@ResponseBody
+	public ResponseEntity<List<CartItem>> checkout() {
+		System.out.println("djftw");
+		
+		return ResponseEntity.ok(cartService.checkout());
+}
+
 	
 	@PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody AppUser user) {
