@@ -26,9 +26,9 @@ import com.project.RestApi.repository.CycleRepository;
 import com.project.RestApi.repository.UserRepository;
 import com.project.RestApi.service.CartService;
 import com.project.RestApi.service.CycleService;
-import com.project.RestApi.entity.AppUser;
 import com.project.RestApi.entity.CartItem;
 import com.project.RestApi.entity.Cycle;
+import com.project.RestApi.entity.User;
 
 @CrossOrigin
 @RestController
@@ -119,7 +119,7 @@ public class CycleController {
 
 	
 	@PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody AppUser user) {
+    public ResponseEntity<String> registerUser(@RequestBody User user) {
         try {
             if (userRepository.existsByName(user.getName())) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username already exists");

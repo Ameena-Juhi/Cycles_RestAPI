@@ -4,21 +4,18 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.project.RestApi.entity.User;
-
 import com.project.RestApi.repository.UserRepository;
 
-
 @Service
-public class DomainUserService {
+public class UserService {
 
     private BCryptPasswordEncoder passwordEncoder;
     private UserRepository userRepository;
 
-    public DomainUserService(@Autowired UserRepository userRepository) {
+    public UserService(@Autowired UserRepository userRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
@@ -40,8 +37,8 @@ public class DomainUserService {
         return userRepository.save(user);
     }
 
-    public Optional<User> getById(int id) {
-        return userRepository.findById(id);
+    public Optional<User> getById(long id) {
+        return userRepository.findById((int) id);
     }
 
     public Optional<User> getByName(String name) {
