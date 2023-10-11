@@ -61,7 +61,7 @@ public class BasicConfiguration {
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(corsConfig))
             .authorizeHttpRequests((requests) -> requests
-            .requestMatchers("/cycle/register", "/api/auth/token", "/api/cycles/payment").permitAll()
+            .requestMatchers("/cycle/register", "/api/auth/token", "/api/cycles/payment", "/cycle/**").permitAll()
             //.requestMatchers("/api/cycles/add","/api/all-Purchases").hasAuthority("SCOPE_ROLE_ADMIN")
            .anyRequest().authenticated())
             .logout(withDefaults())

@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: 'jdbc:mysql://localhost:3306/cycleshop'
+    url: 'jdbc:mysql://db/cycleshop'
     username: Ameena
     password: Ameena
   jpa:
